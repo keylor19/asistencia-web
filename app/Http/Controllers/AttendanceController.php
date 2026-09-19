@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Attendance;
+use App\Models\WhatsappNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
@@ -16,7 +18,7 @@ class AttendanceController extends Controller
      */
     public function create(Request $request, Group $group)
     {
-        $this->authorizeGroup($group->id);
+        $this->authorize('access', $group);
 
         $date = $request->query('date', Carbon::today()->format('Y-m-d'));
 
@@ -46,7 +48,7 @@ class AttendanceController extends Controller
      */
     public function store(Request $request, Group $group)
     {
-        $this->authorizeGroup($group->id);
+        $this->authorize('access', $group);
 
         $validated = $request->validate([
             'date' => 'required|date',
@@ -82,10 +84,39 @@ class AttendanceController extends Controller
             ->with('success', 'Asistencia guardada correctamente.');
     }
 
-    private function authorizeGroup(int $groupId): void
+    /**
+     * Registra que el docente hizo clic en "Avisar por WhatsApp" para un estudiante.
+     * No confirma que el mensaje se haya enviado dentro de WhatsApp, solo que se abrió el chat.
+     */
+    public function notify(Request $request)
     {
-        $perteneceAlGrupo = Auth::user()->groups()->where('student_groups.id', $groupId)->exists();
+        $validated = $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'group_id' => 'required|exists:student_groups,id',
+            'subject_id' => 'nullable|exists:subjects,id',
+            'date' => 'required|date',
+            'status' => 'required|in:ausente,tardia',
+        ]);
 
-        abort_unless($perteneceAlGrupo, 403, 'No tienes acceso a este grupo.');
+        $group = Group::findOrFail($validated['group_id']);
+        $this->authorize('access', $group);
+
+        $student = Student::findOrFail($validated['student_id']);
+        abort_unless($student->group_id === $group->id, 404);
+        abort_unless($student->whatsapp_phone, 422, 'El estudiante no tiene teléfono de encargado registrado.');
+
+        WhatsappNotification::create([
+            'student_id' => $student->id,
+            'group_id' => $group->id,
+            'subject_id' => $validated['subject_id'] ?? null,
+            'user_id' => Auth::id(),
+            'attendance_date' => $validated['date'],
+            'status' => $validated['status'],
+            'guardian_name' => $student->guardian_name,
+            'guardian_phone' => $student->guardian_phone,
+            'sent_at' => now(),
+        ]);
+
+        return response()->json(['ok' => true]);
     }
 }

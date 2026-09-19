@@ -41,6 +41,7 @@
                             <th class="px-4 py-3">Nombre</th>
                             <th class="px-4 py-3">Identificación</th>
                             <th class="px-4 py-3">Grupo</th>
+                            <th class="px-4 py-3">Encargado</th>
                             <th class="px-4 py-3">Estado</th>
                             <th class="px-4 py-3">Acciones</th>
                         </tr>
@@ -52,6 +53,14 @@
                                 <td class="px-4 py-3">{{ $student->identification ?? '—' }}</td>
                                 <td class="px-4 py-3">{{ $student->group->name }}</td>
                                 <td class="px-4 py-3">
+                                    @if ($student->guardian_phone)
+                                        <span class="text-gray-700">{{ $student->guardian_name ?: 'Sin nombre' }}</span>
+                                        <span class="block text-xs text-gray-400">{{ $student->guardian_phone }}</span>
+                                    @else
+                                        <span class="text-xs text-amber-600">Sin teléfono</span>
+                                    @endif
+                                </td>
+                                <td class="px-4 py-3">
                                     @if ($student->active)
                                         <span class="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">Activo</span>
                                     @else
@@ -59,6 +68,9 @@
                                     @endif
                                 </td>
                                 <td class="px-4 py-3 space-x-2">
+                                    <a href="{{ route('reports.student', $student->id) }}"
+                                       class="text-indigo-600 hover:underline">Ver reporte</a>
+
                                     <a href="{{ route('students.edit', $student->id) }}"
                                        class="text-indigo-600 hover:underline">Editar</a>
 
@@ -74,7 +86,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="6" class="px-4 py-6 text-center text-gray-500">
                                     No hay estudiantes registrados todavía.
                                 </td>
                             </tr>

@@ -79,7 +79,11 @@
                     <tbody>
                         @forelse ($summary as $row)
                             <tr class="border-b">
-                                <td class="px-4 py-2 font-medium text-gray-800">{{ $row['name'] }}</td>
+                                <td class="px-4 py-2 font-medium text-gray-800">
+                                    <a href="{{ route('reports.student', $row['student_id']) }}" class="text-indigo-600 hover:underline">
+                                        {{ $row['name'] }}
+                                    </a>
+                                </td>
                                 <td class="px-4 py-2 text-center">{{ $row['presente'] }}</td>
                                 <td class="px-4 py-2 text-center">{{ $row['ausente'] }}</td>
                                 <td class="px-4 py-2 text-center">{{ $row['tardia'] }}</td>
@@ -100,9 +104,9 @@
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 <h3 class="font-semibold text-gray-800 mb-4">Detalle y observaciones</h3>
 
-                @forelse ($records as $studentName => $items)
+                @forelse ($records as $studentId => $items)
                     <div class="mb-6">
-                        <p class="font-medium text-gray-800 mb-2">{{ $studentName }}</p>
+                        <p class="font-medium text-gray-800 mb-2">{{ $items->first()->student->full_name }}</p>
                         <table class="w-full text-sm text-left mb-2">
                             <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
                                 <tr>

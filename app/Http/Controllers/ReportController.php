@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Attendance;
 use Illuminate\Http\Request;
@@ -29,7 +30,7 @@ class ReportController extends Controller
 
         if ($groupId) {
             $group = Group::findOrFail($groupId);
-            $this->authorizeGroup($groupId);
+            $this->authorize('access', $group);
 
             $query = Attendance::with(['student', 'subject'])
                 ->where('group_id', $groupId)
@@ -41,22 +42,57 @@ class ReportController extends Controller
 
             $records = $query->orderBy('attendance_date')
                 ->get()
-                ->groupBy(fn ($record) => $record->student->full_name);
+                ->groupBy('student_id');
         }
 
-        $summary = $records->map(function ($items, $studentName) {
+        $summary = $records->map(function ($items) {
             return [
-                'name' => $studentName,
+                'student_id' => $items->first()->student_id,
+                'name' => $items->first()->student->full_name,
                 'presente' => $items->where('status', 'presente')->count(),
                 'ausente' => $items->where('status', 'ausente')->count(),
                 'tardia' => $items->where('status', 'tardia')->count(),
                 'justificada' => $items->where('status', 'justificada')->count(),
             ];
-        })->values();
+        })->sortBy('name')->values();
 
         return view('reports.index', compact(
             'groups', 'groupId', 'group', 'subjects', 'subjectId',
             'period', 'date', 'startDate', 'endDate', 'records', 'summary'
+        ));
+    }
+
+    /**
+     * Reporte detallado de un estudiante: historial completo de asistencia,
+     * datos del encargado y bitácora de avisos de WhatsApp enviados.
+     */
+    public function student(Student $student)
+    {
+        $this->authorize('access', $student->group);
+
+        $student->load('group');
+
+        $attendances = $student->attendances()
+            ->with('subject')
+            ->orderByDesc('attendance_date')
+            ->get();
+
+        $summary = [
+            'presente' => $attendances->where('status', 'presente')->count(),
+            'ausente' => $attendances->where('status', 'ausente')->count(),
+            'tardia' => $attendances->where('status', 'tardia')->count(),
+            'justificada' => $attendances->where('status', 'justificada')->count(),
+        ];
+
+        $absencesAndLateness = $attendances->whereIn('status', ['ausente', 'tardia']);
+
+        $notifications = $student->whatsappNotifications()
+            ->with(['teacher', 'subject'])
+            ->orderByDesc('sent_at')
+            ->get();
+
+        return view('reports.student', compact(
+            'student', 'attendances', 'summary', 'absencesAndLateness', 'notifications'
         ));
     }
 
@@ -69,12 +105,5 @@ class ReportController extends Controller
             'month' => [$carbon->copy()->startOfMonth(), $carbon->copy()->endOfMonth()],
             default => [$carbon->copy(), $carbon->copy()],
         };
-    }
-
-    private function authorizeGroup(int $groupId): void
-    {
-        $perteneceAlGrupo = Auth::user()->groups()->where('student_groups.id', $groupId)->exists();
-
-        abort_unless($perteneceAlGrupo, 403, 'No tienes acceso a este grupo.');
     }
 }

@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/grupos', [GroupController::class, 'index'])->name('groups.index');
 
+    Route::post('/asistencia/notificar', [AttendanceController::class, 'notify'])->name('attendance.notify');
     Route::get('/asistencia/{group}', [AttendanceController::class, 'create'])->name('attendance.create');
     Route::post('/asistencia/{group}', [AttendanceController::class, 'store'])->name('attendance.store');
 
@@ -41,6 +42,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/subareas/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
     Route::get('/reportes', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reportes/estudiante/{student}', [ReportController::class, 'student'])->name('reports.student');
 });
 
 require __DIR__.'/auth.php';

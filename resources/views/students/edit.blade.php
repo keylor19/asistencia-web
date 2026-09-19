@@ -40,6 +40,32 @@
                         </select>
                     </div>
 
+                    <div class="mb-4 pt-2 border-t border-gray-100">
+                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 mt-3">
+                            Contacto del encargado (para notificaciones de WhatsApp)
+                        </p>
+
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre del encargado (opcional)</label>
+                        <input type="text" name="guardian_name"
+                               value="{{ old('guardian_name', $student->guardian_name) }}"
+                               class="w-full border-gray-300 rounded-lg shadow-sm">
+                        @error('guardian_name')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">WhatsApp del encargado (opcional)</label>
+                        <input type="text" name="guardian_phone"
+                               value="{{ old('guardian_phone', $student->guardian_phone) }}"
+                               placeholder="8888-8888"
+                               class="w-full border-gray-300 rounded-lg shadow-sm">
+                        <p class="text-xs text-gray-500 mt-1">Sin necesidad de poner 506, se agrega automáticamente.</p>
+                        @error('guardian_phone')
+                            <p class="text-red-600 text-sm mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
                         <select name="active" class="w-full border-gray-300 rounded-lg shadow-sm" required>

@@ -49,9 +49,11 @@ class StudentController extends Controller
             'full_name' => 'required|string|max:150',
             'identification' => 'nullable|string|max:30',
             'group_id' => 'required|exists:student_groups,id',
+            'guardian_name' => 'nullable|string|max:150',
+            'guardian_phone' => 'nullable|regex:/^[0-9+\s-]{8,20}$/',
         ]);
 
-        $this->authorizeGroup($validated['group_id']);
+        $this->authorize('access', Group::findOrFail($validated['group_id']));
 
         Student::create($validated);
 
@@ -63,7 +65,7 @@ class StudentController extends Controller
      */
     public function edit(Student $student)
     {
-        $this->authorizeGroup($student->group_id);
+        $this->authorize('access', $student->group);
 
         $groups = Auth::user()->groups;
 
@@ -75,16 +77,18 @@ class StudentController extends Controller
      */
     public function update(Request $request, Student $student)
     {
-        $this->authorizeGroup($student->group_id);
+        $this->authorize('access', $student->group);
 
         $validated = $request->validate([
             'full_name' => 'required|string|max:150',
             'identification' => 'nullable|string|max:30',
             'group_id' => 'required|exists:student_groups,id',
             'active' => 'required|boolean',
+            'guardian_name' => 'nullable|string|max:150',
+            'guardian_phone' => 'nullable|regex:/^[0-9+\s-]{8,20}$/',
         ]);
 
-        $this->authorizeGroup($validated['group_id']);
+        $this->authorize('access', Group::findOrFail($validated['group_id']));
 
         $student->update($validated);
 
@@ -96,20 +100,10 @@ class StudentController extends Controller
      */
     public function destroy(Student $student)
     {
-        $this->authorizeGroup($student->group_id);
+        $this->authorize('access', $student->group);
 
         $student->update(['active' => 0]);
 
         return redirect()->route('students.index')->with('success', 'Estudiante dado de baja.');
-    }
-
-    /**
-     * Verifica que el grupo pertenezca al docente autenticado.
-     */
-    private function authorizeGroup(int $groupId): void
-    {
-        $perteneceAlGrupo = Auth::user()->groups()->where('student_groups.id', $groupId)->exists();
-
-        abort_unless($perteneceAlGrupo, 403, 'No tienes acceso a este grupo.');
     }
 }

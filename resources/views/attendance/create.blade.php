@@ -46,6 +46,19 @@
                         </div>
                     </form>
 
+                    @php
+                        $subjectName = optional($subjects->firstWhere('id', $subjectId))->name ?? 'la clase';
+                        $dateFormatted = \Carbon\Carbon::parse($date)->format('d/m/Y');
+                        $isDiurno = $group->shift === 'diurno';
+                    @endphp
+
+                    @if ($isDiurno)
+                        <p class="mb-4 text-xs text-gray-500">
+                            Este grupo es de jornada diurna: para los estudiantes marcados como <strong>ausente</strong> o
+                            <strong>tardía</strong> podés avisarle al encargado por WhatsApp con un clic.
+                        </p>
+                    @endif
+
                     <!-- Formulario de asistencia -->
                     <form method="POST" action="{{ route('attendance.store', $group->id) }}">
                         @csrf
@@ -58,6 +71,9 @@
                                     <th class="px-4 py-3">Estudiante</th>
                                     <th class="px-4 py-3">Estado</th>
                                     <th class="px-4 py-3">Observación</th>
+                                    @if ($isDiurno)
+                                        <th class="px-4 py-3">Avisar</th>
+                                    @endif
                                 </tr>
                             </thead>
                             <tbody>
@@ -65,8 +81,20 @@
                                     @php
                                         $current = $existing[$student->id] ?? 'presente';
                                         $currentNote = $existingNotes[$student->id] ?? null;
+
+                                        $waLinks = null;
+                                        if ($isDiurno && $student->whatsapp_phone) {
+                                            $waLinks = [
+                                                'tardia' => 'https://wa.me/' . $student->whatsapp_phone . '?text=' . rawurlencode(
+                                                    "Estimado(a) encargado(a) de {$student->full_name}: le informamos que hoy {$dateFormatted} llegó tarde a la clase de {$subjectName}. - CTP Los Chiles"
+                                                ),
+                                                'ausente' => 'https://wa.me/' . $student->whatsapp_phone . '?text=' . rawurlencode(
+                                                    "Estimado(a) encargado(a) de {$student->full_name}: le informamos que hoy {$dateFormatted} está ausente en la clase de {$subjectName}. - CTP Los Chiles"
+                                                ),
+                                            ];
+                                        }
                                     @endphp
-                                    <tr class="border-b" x-data="{ status: '{{ $current }}' }">
+                                    <tr class="border-b" x-data='{ status: "{{ $current }}", links: @json($waLinks) }'>
                                         <td class="px-4 py-3 font-medium text-gray-800">
                                             {{ $student->full_name }}
                                         </td>
@@ -91,6 +119,34 @@
                                                    "
                                                    class="border-gray-300 rounded-lg text-sm w-full">
                                         </td>
+                                        @if ($isDiurno)
+                                            <td class="px-4 py-3">
+                                                <template x-if="links && links[status]">
+                                                    <a x-bind:href="links[status]" target="_blank" rel="noopener"
+                                                       x-on:click="fetch('{{ route('attendance.notify') }}', {
+                                                           method: 'POST',
+                                                           headers: {
+                                                               'Content-Type': 'application/json',
+                                                               'Accept': 'application/json',
+                                                               'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content,
+                                                           },
+                                                           body: JSON.stringify({
+                                                               student_id: {{ $student->id }},
+                                                               group_id: {{ $group->id }},
+                                                               subject_id: {{ $subjectId ?? 'null' }},
+                                                               date: '{{ $date }}',
+                                                               status: status,
+                                                           }),
+                                                       })"
+                                                       class="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-white bg-green-600 rounded-md hover:bg-green-700">
+                                                        WhatsApp
+                                                    </a>
+                                                </template>
+                                                <template x-if="!links && (status === 'ausente' || status === 'tardia')">
+                                                    <span class="text-xs text-gray-400">Sin teléfono</span>
+                                                </template>
+                                            </td>
+                                        @endif
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -1,4 +1,7 @@
 <x-guest-layout>
+    <h2 class="text-xl font-semibold text-gray-800 text-center mb-1">{{ __('Iniciar sesión') }}</h2>
+    <p class="text-sm text-gray-500 text-center mb-6">{{ __('Ingresa tus credenciales para continuar') }}</p>
+
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
