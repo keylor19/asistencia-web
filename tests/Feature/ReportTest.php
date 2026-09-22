@@ -121,7 +121,9 @@ class ReportTest extends TestCase
             'sent_at' => '2026-01-15 08:30:00',
         ]);
 
-        $response = $this->actingAs($teacher)->get(route('reports.student', $student->id));
+        $response = $this->actingAs($teacher)->get(
+            route('reports.student', ['student' => $student->id, 'period' => 'week', 'date' => '2026-01-15'])
+        );
 
         $response->assertOk();
         $response->assertSee('Ana Pérez');
@@ -143,6 +145,48 @@ class ReportTest extends TestCase
         $student = Student::create(['group_id' => $otherGroup->id, 'full_name' => 'Ana Pérez', 'active' => 1]);
 
         $response = $this->actingAs($teacher)->get(route('reports.student', $student->id));
+
+        $response->assertForbidden();
+    }
+
+    public function test_teacher_can_download_the_student_report_as_pdf(): void
+    {
+        $teacher = User::factory()->create();
+        $group = Group::create(['name' => 'Undécimo A', 'shift' => 'diurno']);
+        $teacher->groups()->attach($group->id);
+        $subject = Subject::create(['name' => 'Matemática']);
+        $student = Student::create([
+            'group_id' => $group->id,
+            'full_name' => 'Ana Pérez',
+            'active' => 1,
+            'guardian_name' => 'María Pérez',
+            'guardian_phone' => '8888-1234',
+        ]);
+
+        Attendance::create([
+            'student_id' => $student->id,
+            'group_id' => $group->id,
+            'subject_id' => $subject->id,
+            'user_id' => $teacher->id,
+            'attendance_date' => '2026-01-15',
+            'status' => 'tardia',
+        ]);
+
+        $response = $this->actingAs($teacher)->get(
+            route('reports.student.pdf', ['student' => $student->id, 'period' => 'week', 'date' => '2026-01-15'])
+        );
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_teacher_cannot_download_pdf_report_for_a_student_that_is_not_theirs(): void
+    {
+        $teacher = User::factory()->create();
+        $otherGroup = Group::create(['name' => 'Undécimo B', 'shift' => 'diurno']);
+        $student = Student::create(['group_id' => $otherGroup->id, 'full_name' => 'Ana Pérez', 'active' => 1]);
+
+        $response = $this->actingAs($teacher)->get(route('reports.student.pdf', $student->id));
 
         $response->assertForbidden();
     }

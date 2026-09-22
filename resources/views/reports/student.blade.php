@@ -14,6 +14,42 @@
     <div class="py-12">
         <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
+            <!-- Filtro de periodo y descarga de PDF -->
+            <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                <form method="GET" action="{{ route('reports.student', $student->id) }}"
+                      class="flex flex-wrap items-end gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Periodo</label>
+                        <select name="period" class="border-gray-300 rounded-lg text-sm">
+                            <option value="week" @selected($period === 'week')>Última semana</option>
+                            <option value="month" @selected($period === 'month')>Último mes</option>
+                            <option value="quarter" @selected($period === 'quarter')>Últimos 3 meses</option>
+                            <option value="semester" @selected($period === 'semester')>Últimos 6 meses</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Hasta la fecha</label>
+                        <input type="date" name="date" value="{{ $date }}" class="border-gray-300 rounded-lg text-sm">
+                    </div>
+
+                    <button type="submit"
+                            class="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
+                        Ver periodo
+                    </button>
+
+                    <a href="{{ route('reports.student.pdf', ['student' => $student->id, 'period' => $period, 'date' => $date]) }}"
+                       class="px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">
+                        Descargar PDF
+                    </a>
+                </form>
+
+                <p class="text-sm text-gray-500 mt-3">
+                    Mostrando del <strong>{{ $startDate->format('d/m/Y') }}</strong>
+                    al <strong>{{ $endDate->format('d/m/Y') }}</strong>
+                </p>
+            </div>
+
             <!-- Datos del estudiante y del encargado -->
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 <div class="flex flex-wrap items-start justify-between gap-4">
@@ -64,7 +100,7 @@
 
             <!-- Ausencias y tardías -->
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <h3 class="font-semibold text-gray-800 mb-4">Ausencias y tardías</h3>
+                <h3 class="font-semibold text-gray-800 mb-4">Ausencias y tardías del periodo</h3>
                 <table class="w-full text-sm text-left">
                     <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
                         <tr>
@@ -72,6 +108,7 @@
                             <th class="px-4 py-2">Subárea</th>
                             <th class="px-4 py-2">Estado</th>
                             <th class="px-4 py-2">Observación</th>
+                            <th class="px-4 py-2">Avisado por WhatsApp</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,11 +122,22 @@
                                     </span>
                                 </td>
                                 <td class="px-4 py-2 text-gray-600">{{ $item->notes ?? '—' }}</td>
+                                <td class="px-4 py-2">
+                                    @if ($item->notified_at)
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                            Sí, {{ $item->notified_at->format('d/m/Y h:i A') }}
+                                        </span>
+                                    @else
+                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-500">
+                                            No avisado
+                                        </span>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
-                                    No tiene ausencias ni tardías registradas.
+                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                                    No tiene ausencias ni tardías en este periodo.
                                 </td>
                             </tr>
                         @endforelse
@@ -99,7 +147,7 @@
 
             <!-- Avisos de WhatsApp enviados -->
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <h3 class="font-semibold text-gray-800 mb-1">Avisos de WhatsApp enviados</h3>
+                <h3 class="font-semibold text-gray-800 mb-1">Avisos de WhatsApp enviados en el periodo</h3>
                 <p class="text-xs text-gray-500 mb-4">
                     Muestra cuándo se hizo clic en "Avisar por WhatsApp". No confirma que el mensaje haya sido enviado
                     dentro de WhatsApp, solo que se abrió el chat con el encargado.
@@ -132,7 +180,7 @@
                         @empty
                             <tr>
                                 <td colspan="6" class="px-4 py-6 text-center text-gray-500">
-                                    Todavía no se ha enviado ningún aviso por WhatsApp para este estudiante.
+                                    No se envió ningún aviso por WhatsApp en este periodo.
                                 </td>
                             </tr>
                         @endforelse
@@ -142,7 +190,7 @@
 
             <!-- Historial completo -->
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <h3 class="font-semibold text-gray-800 mb-4">Historial completo de asistencia</h3>
+                <h3 class="font-semibold text-gray-800 mb-4">Historial de asistencia del periodo</h3>
                 <table class="w-full text-sm text-left">
                     <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
                         <tr>
@@ -175,7 +223,7 @@
                         @empty
                             <tr>
                                 <td colspan="4" class="px-4 py-6 text-center text-gray-500">
-                                    No hay registros de asistencia para este estudiante.
+                                    No hay registros de asistencia en este periodo.
                                 </td>
                             </tr>
                         @endforelse

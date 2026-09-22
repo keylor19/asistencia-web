@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/reportes', [ReportController::class, 'index'])->name('reports.index');
     Route::get('/reportes/estudiante/{student}', [ReportController::class, 'student'])->name('reports.student');
+    Route::get('/reportes/estudiante/{student}/pdf', [ReportController::class, 'studentPdf'])->name('reports.student.pdf');
 });
 
 require __DIR__.'/auth.php';
