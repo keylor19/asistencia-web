@@ -24,6 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/grupos', [GroupController::class, 'index'])->name('groups.index');
 
     Route::post('/asistencia/notificar', [AttendanceController::class, 'notify'])->name('attendance.notify');
+    Route::get('/asistencia/{group}/pdf', [AttendanceController::class, 'dailyPdf'])->name('attendance.daily-pdf');
     Route::get('/asistencia/{group}', [AttendanceController::class, 'create'])->name('attendance.create');
     Route::post('/asistencia/{group}', [AttendanceController::class, 'store'])->name('attendance.store');
 

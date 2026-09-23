@@ -44,6 +44,13 @@
                                    onchange="this.form.submit()"
                                    class="border-gray-300 rounded-lg shadow-sm text-sm">
                         </div>
+
+                        <div>
+                            <a href="{{ route('attendance.daily-pdf', ['group' => $group->id, 'date' => $date, 'subject' => $subjectId]) }}"
+                               class="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700">
+                                Descargar PDF de este día
+                            </a>
+                        </div>
                     </form>
 
                     @php

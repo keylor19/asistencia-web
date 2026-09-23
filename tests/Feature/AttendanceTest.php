@@ -159,4 +159,41 @@ class AttendanceTest extends TestCase
         $response->assertForbidden();
         $this->assertDatabaseMissing('whatsapp_notifications', ['student_id' => $student->id]);
     }
+
+    public function test_teacher_can_download_the_daily_attendance_pdf_for_their_group(): void
+    {
+        $teacher = User::factory()->create();
+        $group = Group::create(['name' => 'Décimo A', 'shift' => 'diurno']);
+        $teacher->groups()->attach($group->id);
+        $subject = Subject::create(['name' => 'Matemática']);
+        $present = Student::create(['group_id' => $group->id, 'full_name' => 'Ana Pérez', 'active' => 1]);
+        $unregistered = Student::create(['group_id' => $group->id, 'full_name' => 'Beto Solano', 'active' => 1]);
+
+        Attendance::create([
+            'student_id' => $present->id,
+            'group_id' => $group->id,
+            'subject_id' => $subject->id,
+            'user_id' => $teacher->id,
+            'attendance_date' => '2026-01-15',
+            'status' => 'tardia',
+            'notes' => 'Llegó tarde',
+        ]);
+
+        $response = $this->actingAs($teacher)->get(
+            "/asistencia/{$group->id}/pdf?date=2026-01-15&subject={$subject->id}"
+        );
+
+        $response->assertOk();
+        $response->assertHeader('content-type', 'application/pdf');
+    }
+
+    public function test_teacher_cannot_download_daily_pdf_for_a_group_that_is_not_theirs(): void
+    {
+        $teacher = User::factory()->create();
+        $otherGroup = Group::create(['name' => 'Undécimo B', 'shift' => 'nocturno']);
+
+        $response = $this->actingAs($teacher)->get("/asistencia/{$otherGroup->id}/pdf");
+
+        $response->assertForbidden();
+    }
 }
