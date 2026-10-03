@@ -25,13 +25,20 @@
                             </span>
                         </div>
 
-                        <p class="text-gray-500 text-sm mb-4">
+                        <p class="text-gray-500 text-sm mb-1">
                             {{ $group->students_count }} estudiante(s)
+                        </p>
+                        <p class="text-gray-500 text-sm mb-4">
+                            {{ $group->type === 'tecnico' ? 'Técnico' : 'Académico' }} — {{ $group->lessons_per_day }} lecciones por día completo
                         </p>
 
                         <a href="{{ route('attendance.create', ['group' => $group->id]) }}"
                            class="inline-block px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700">
                             Pasar lista
+                        </a>
+                        <a href="{{ route('groups.edit', $group->id) }}"
+                           class="inline-block px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 ml-2">
+                            Configurar
                         </a>
                     </div>
                 @empty

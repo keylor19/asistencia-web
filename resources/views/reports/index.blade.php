@@ -74,6 +74,8 @@
                             <th class="px-4 py-2 text-center">Ausente</th>
                             <th class="px-4 py-2 text-center">Tardía</th>
                             <th class="px-4 py-2 text-center">Justificada</th>
+                            <th class="px-4 py-2 text-center">Suspendida</th>
+                            <th class="px-4 py-2 text-center">Lecciones perdidas</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -88,10 +90,12 @@
                                 <td class="px-4 py-2 text-center">{{ $row['ausente'] }}</td>
                                 <td class="px-4 py-2 text-center">{{ $row['tardia'] }}</td>
                                 <td class="px-4 py-2 text-center">{{ $row['justificada'] }}</td>
+                                <td class="px-4 py-2 text-center">{{ $row['suspendida'] }}</td>
+                                <td class="px-4 py-2 text-center">{{ $row['lecciones_perdidas'] }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="7" class="px-4 py-6 text-center text-gray-500">
                                     No hay registros de asistencia en este periodo.
                                 </td>
                             </tr>
@@ -113,6 +117,7 @@
                                     <th class="px-4 py-2">Fecha</th>
                                     <th class="px-4 py-2">Subárea</th>
                                     <th class="px-4 py-2">Estado</th>
+                                    <th class="px-4 py-2">Lecciones</th>
                                     <th class="px-4 py-2">Observación</th>
                                 </tr>
                             </thead>
@@ -128,12 +133,14 @@
                                                     'ausente' => 'bg-red-100 text-red-800',
                                                     'tardia' => 'bg-yellow-100 text-yellow-800',
                                                     'justificada' => 'bg-blue-100 text-blue-800',
+                                                    'suspendida' => 'bg-gray-200 text-gray-700',
                                                 ];
                                             @endphp
                                             <span class="px-2 py-1 text-xs rounded-full {{ $colors[$item->status] }}">
                                                 {{ ucfirst($item->status) }}
                                             </span>
                                         </td>
+                                        <td class="px-4 py-2 text-gray-600">{{ $item->lessons ?? '—' }}</td>
                                         <td class="px-4 py-2 text-gray-600">{{ $item->notes ?? '—' }}</td>
                                     </tr>
                                 @endforeach

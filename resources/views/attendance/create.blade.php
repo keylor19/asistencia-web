@@ -16,6 +16,45 @@
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg p-6">
 
+                @php
+                    $dateFormatted = \Carbon\Carbon::parse($date)->format('d/m/Y');
+                @endphp
+
+                @if ($suspension)
+                    <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p class="text-sm text-red-800">
+                            Las clases de este día ({{ $dateFormatted }}) fueron <strong>suspendidas</strong>.
+                            Motivo: {{ $suspension->reason }}
+                        </p>
+                        <div class="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
+                            <a href="{{ route('suspensions.notify', ['group' => $group->id, 'date' => $date]) }}"
+                               class="text-sm text-indigo-600 hover:underline">
+                                Ver / avisar a los encargados por WhatsApp
+                            </a>
+                            <a href="{{ route('suspensions.create', ['group' => $group->id, 'date' => $date]) }}"
+                               class="text-sm text-indigo-600 hover:underline">
+                                Editar motivo
+                            </a>
+                            <form method="POST" action="{{ route('suspensions.destroy', ['group' => $group->id]) }}"
+                                  onsubmit="return confirm('¿Cancelar la suspensión de este día? Se borrará y vas a poder pasar asistencia normalmente.');">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="date" value="{{ $date }}">
+                                <button type="submit" class="text-sm text-red-700 hover:underline">
+                                    Cancelar suspensión (fue un error)
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <div class="mb-4">
+                        <a href="{{ route('suspensions.create', ['group' => $group->id, 'date' => $date]) }}"
+                           class="inline-flex items-center px-4 py-2 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-50">
+                            Suspender clases este día
+                        </a>
+                    </div>
+                @endif
+
                 @if ($subjects->isEmpty())
                     <div class="mb-4 p-4 bg-yellow-100 text-yellow-800 rounded-lg">
                         No hay subáreas registradas todavía.
@@ -55,9 +94,10 @@
 
                     @php
                         $subjectName = optional($subjects->firstWhere('id', $subjectId))->name ?? 'la clase';
-                        $dateFormatted = \Carbon\Carbon::parse($date)->format('d/m/Y');
                         $isDiurno = $group->shift === 'diurno';
                     @endphp
+
+                    @unless ($suspension)
 
                     @if ($isDiurno)
                         <p class="mb-4 text-xs text-gray-500">
@@ -72,11 +112,29 @@
                         <input type="hidden" name="date" value="{{ $date }}">
                         <input type="hidden" name="subject_id" value="{{ $subjectId }}">
 
+                        <div class="mb-6">
+                            <label for="class_note" class="block text-sm font-medium text-gray-700 mb-1">
+                                ¿Qué se trabajó este día?
+                            </label>
+                            <textarea name="class_note" id="class_note" rows="2"
+                                      placeholder="Ej: Se trabajó en instalación de XAMPP y configuración del servidor local"
+                                      class="w-full border-gray-300 rounded-lg shadow-sm text-sm">{{ old('class_note', $classNote->content ?? '') }}</textarea>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Se guarda junto con la asistencia y aparece en el cuadro de observaciones del PDF del día.
+                            </p>
+                        </div>
+
+                        <p class="mb-2 text-xs text-gray-500">
+                            Al marcar ausente, tardía o justificada, indicá cuántas lecciones abarca (este grupo es
+                            {{ $group->type === 'tecnico' ? 'técnico' : 'académico' }}: día completo = {{ $group->lessons_per_day }} lecciones).
+                        </p>
+
                         <table class="w-full text-sm text-left">
                             <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
                                 <tr>
                                     <th class="px-4 py-3">Estudiante</th>
                                     <th class="px-4 py-3">Estado</th>
+                                    <th class="px-4 py-3">Lecciones</th>
                                     <th class="px-4 py-3">Observación</th>
                                     @if ($isDiurno)
                                         <th class="px-4 py-3">Avisar</th>
@@ -88,6 +146,7 @@
                                     @php
                                         $current = $existing[$student->id] ?? 'presente';
                                         $currentNote = $existingNotes[$student->id] ?? null;
+                                        $currentLessons = $existingLessons[$student->id] ?? null;
 
                                         $waLinks = null;
                                         if ($isDiurno && $student->whatsapp_phone) {
@@ -101,7 +160,7 @@
                                             ];
                                         }
                                     @endphp
-                                    <tr class="border-b" x-data='{ status: "{{ $current }}", links: @json($waLinks) }'>
+                                    <tr class="border-b" x-data='{ status: "{{ $current }}", lessons: {{ $currentLessons ?? "null" }}, links: @json($waLinks) }'>
                                         <td class="px-4 py-3 font-medium text-gray-800">
                                             {{ $student->full_name }}
                                         </td>
@@ -114,6 +173,15 @@
                                                 <option value="tardia">Tardía</option>
                                                 <option value="justificada">Justificada</option>
                                             </select>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <input type="number" name="lessons[{{ $student->id }}]"
+                                                   x-model="lessons"
+                                                   x-show="status !== 'presente'"
+                                                   x-bind:disabled="status === 'presente'"
+                                                   min="1" max="{{ $group->lessons_per_day }}"
+                                                   placeholder="Cant."
+                                                   class="w-20 border-gray-300 rounded-lg text-sm">
                                         </td>
                                         <td class="px-4 py-3">
                                             <input type="text" name="notes[{{ $student->id }}]"
@@ -169,6 +237,7 @@
                             </a>
                         </div>
                     </form>
+                    @endunless
                 @endif
             </div>
 

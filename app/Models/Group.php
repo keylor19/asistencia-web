@@ -10,7 +10,7 @@ class Group extends Model
 {
     protected $table = 'student_groups'; // la tabla real se llama así, no "groups"
 
-    protected $fillable = ['name', 'shift'];
+    protected $fillable = ['name', 'shift', 'type', 'lessons_per_day'];
 
     public function students(): HasMany
     {
@@ -25,5 +25,15 @@ class Group extends Model
     public function attendances(): HasMany
     {
         return $this->hasMany(Attendance::class);
+    }
+
+    public function suspensions(): HasMany
+    {
+        return $this->hasMany(ClassSuspension::class);
+    }
+
+    public function classNotes(): HasMany
+    {
+        return $this->hasMany(ClassNote::class);
     }
 }

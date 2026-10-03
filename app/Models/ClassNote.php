@@ -5,20 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Attendance extends Model
+class ClassNote extends Model
 {
-    protected $fillable = [
-        'student_id', 'group_id', 'subject_id', 'user_id', 'attendance_date', 'status', 'lessons', 'notes'
-    ];
+    protected $fillable = ['group_id', 'subject_id', 'user_id', 'note_date', 'content'];
 
     protected $casts = [
-        'attendance_date' => 'date',
+        'note_date' => 'date',
     ];
-
-    public function student(): BelongsTo
-    {
-        return $this->belongsTo(Student::class);
-    }
 
     public function group(): BelongsTo
     {

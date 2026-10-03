@@ -7,6 +7,7 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\ClassSuspensionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -22,9 +23,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('/grupos', [GroupController::class, 'index'])->name('groups.index');
+    Route::get('/grupos/{group}/editar', [GroupController::class, 'edit'])->name('groups.edit');
+    Route::put('/grupos/{group}', [GroupController::class, 'update'])->name('groups.update');
 
     Route::post('/asistencia/notificar', [AttendanceController::class, 'notify'])->name('attendance.notify');
     Route::get('/asistencia/{group}/pdf', [AttendanceController::class, 'dailyPdf'])->name('attendance.daily-pdf');
+    Route::get('/asistencia/{group}/suspender', [ClassSuspensionController::class, 'create'])->name('suspensions.create');
+    Route::post('/asistencia/{group}/suspender', [ClassSuspensionController::class, 'store'])->name('suspensions.store');
+    Route::get('/asistencia/{group}/suspender/avisar', [ClassSuspensionController::class, 'notify'])->name('suspensions.notify');
+    Route::delete('/asistencia/{group}/suspender', [ClassSuspensionController::class, 'destroy'])->name('suspensions.destroy');
     Route::get('/asistencia/{group}', [AttendanceController::class, 'create'])->name('attendance.create');
     Route::post('/asistencia/{group}', [AttendanceController::class, 'store'])->name('attendance.store');
 

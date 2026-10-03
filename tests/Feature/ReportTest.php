@@ -45,7 +45,7 @@ class ReportTest extends TestCase
         $teacher = User::factory()->create();
         $group = Group::create(['name' => 'Décimo A', 'shift' => 'diurno']);
         $teacher->groups()->attach($group->id);
-        $subject = Subject::create(['name' => 'Matemática']);
+        $subject = Subject::create(['name' => 'Matemática', 'user_id' => $teacher->id]);
 
         $studentA = Student::create(['group_id' => $group->id, 'full_name' => 'José Rodríguez', 'active' => 1]);
         $studentB = Student::create(['group_id' => $group->id, 'full_name' => 'José Rodríguez', 'active' => 1]);
@@ -90,7 +90,7 @@ class ReportTest extends TestCase
         $teacher = User::factory()->create();
         $group = Group::create(['name' => 'Undécimo A', 'shift' => 'diurno']);
         $teacher->groups()->attach($group->id);
-        $subject = Subject::create(['name' => 'Matemática']);
+        $subject = Subject::create(['name' => 'Matemática', 'user_id' => $teacher->id]);
         $student = Student::create([
             'group_id' => $group->id,
             'full_name' => 'Ana Pérez',
@@ -154,7 +154,7 @@ class ReportTest extends TestCase
         $teacher = User::factory()->create();
         $group = Group::create(['name' => 'Undécimo A', 'shift' => 'diurno']);
         $teacher->groups()->attach($group->id);
-        $subject = Subject::create(['name' => 'Matemática']);
+        $subject = Subject::create(['name' => 'Matemática', 'user_id' => $teacher->id]);
         $student = Student::create([
             'group_id' => $group->id,
             'full_name' => 'Ana Pérez',

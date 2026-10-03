@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class SubjectController extends Controller
 {
     public function index()
     {
-        $subjects = Subject::orderBy('name')->get();
+        $subjects = Subject::where('user_id', Auth::id())->orderBy('name')->get();
 
         return view('subjects.index', compact('subjects'));
     }
@@ -22,23 +24,36 @@ class SubjectController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:150|unique:subjects,name',
+            'name' => [
+                'required', 'string', 'max:150',
+                Rule::unique('subjects')->where(fn ($query) => $query->where('user_id', Auth::id())),
+            ],
         ]);
 
-        Subject::create($validated);
+        Subject::create([
+            'name' => $validated['name'],
+            'user_id' => Auth::id(),
+        ]);
 
         return redirect()->route('subjects.index')->with('success', 'Subárea agregada correctamente.');
     }
 
     public function edit(Subject $subject)
     {
+        $this->authorize('access', $subject);
+
         return view('subjects.edit', compact('subject'));
     }
 
     public function update(Request $request, Subject $subject)
     {
+        $this->authorize('access', $subject);
+
         $validated = $request->validate([
-            'name' => 'required|string|max:150|unique:subjects,name,' . $subject->id,
+            'name' => [
+                'required', 'string', 'max:150',
+                Rule::unique('subjects')->where(fn ($query) => $query->where('user_id', Auth::id()))->ignore($subject->id),
+            ],
         ]);
 
         $subject->update($validated);
@@ -48,6 +63,8 @@ class SubjectController extends Controller
 
     public function destroy(Subject $subject)
     {
+        $this->authorize('access', $subject);
+
         $subject->delete();
 
         return redirect()->route('subjects.index')->with('success', 'Subárea eliminada.');

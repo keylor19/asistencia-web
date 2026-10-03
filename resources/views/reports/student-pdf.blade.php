@@ -76,6 +76,7 @@
         .badge-ausente { background-color: #fee2e2; color: #991b1b; }
         .badge-tardia { background-color: #fef3c7; color: #92400e; }
         .badge-justificada { background-color: #dbeafe; color: #1e40af; }
+        .badge-suspendida { background-color: #e5e7eb; color: #374151; }
         .badge-yes { background-color: #d1fae5; color: #065f46; }
         .badge-no { background-color: #f3f4f6; color: #6b7280; }
         .meta-table td { border: none; padding: 2px 0; font-size: 10px; }
@@ -133,6 +134,8 @@
                 <th>Ausente</th>
                 <th>Tardía</th>
                 <th>Justificada</th>
+                <th>Suspendida</th>
+                <th>Lecciones perdidas</th>
             </tr>
         </thead>
         <tbody>
@@ -141,6 +144,8 @@
                 <td>{{ $summary['ausente'] }}</td>
                 <td>{{ $summary['tardia'] }}</td>
                 <td>{{ $summary['justificada'] }}</td>
+                <td>{{ $summary['suspendida'] }}</td>
+                <td>{{ $summary['lecciones_perdidas'] }}</td>
             </tr>
         </tbody>
     </table>
@@ -152,6 +157,7 @@
                 <th>Fecha</th>
                 <th>Subárea</th>
                 <th>Estado</th>
+                <th>Lecciones</th>
                 <th>Observación</th>
                 <th>Avisado por WhatsApp</th>
             </tr>
@@ -166,6 +172,7 @@
                             {{ ucfirst($item->status) }}
                         </span>
                     </td>
+                    <td>{{ $item->lessons ?? '—' }}</td>
                     <td>{{ $item->notes ?? '—' }}</td>
                     <td>
                         @if ($item->notified_at)
@@ -177,7 +184,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">No tiene ausencias ni tardías en este periodo.</td>
+                    <td colspan="6">No tiene ausencias ni tardías en este periodo.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -200,7 +207,7 @@
                 <tr>
                     <td>{{ $notification->sent_at->format('d/m/Y h:i A') }}</td>
                     <td>
-                        <span class="badge {{ $notification->status === 'ausente' ? 'badge-ausente' : 'badge-tardia' }}">
+                        <span class="badge badge-{{ $notification->status }}">
                             {{ ucfirst($notification->status) }}
                         </span>
                     </td>
@@ -228,6 +235,7 @@
                 <th>Fecha</th>
                 <th>Subárea</th>
                 <th>Estado</th>
+                <th>Lecciones</th>
                 <th>Observación</th>
             </tr>
         </thead>
@@ -239,11 +247,12 @@
                     <td>
                         <span class="badge badge-{{ $item->status }}">{{ ucfirst($item->status) }}</span>
                     </td>
+                    <td>{{ $item->lessons ?? '—' }}</td>
                     <td>{{ $item->notes ?? '—' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">No hay registros de asistencia en este periodo.</td>
+                    <td colspan="5">No hay registros de asistencia en este periodo.</td>
                 </tr>
             @endforelse
         </tbody>

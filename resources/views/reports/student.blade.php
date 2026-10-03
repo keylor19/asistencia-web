@@ -79,7 +79,7 @@
             </div>
 
             <!-- Resumen -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 sm:grid-cols-6 gap-4">
                 <div class="bg-white shadow-sm sm:rounded-lg p-4 text-center">
                     <p class="text-2xl font-semibold text-green-700">{{ $summary['presente'] }}</p>
                     <p class="text-xs uppercase tracking-wide text-gray-400 mt-1">Presente</p>
@@ -96,6 +96,14 @@
                     <p class="text-2xl font-semibold text-blue-700">{{ $summary['justificada'] }}</p>
                     <p class="text-xs uppercase tracking-wide text-gray-400 mt-1">Justificada</p>
                 </div>
+                <div class="bg-white shadow-sm sm:rounded-lg p-4 text-center">
+                    <p class="text-2xl font-semibold text-gray-600">{{ $summary['suspendida'] }}</p>
+                    <p class="text-xs uppercase tracking-wide text-gray-400 mt-1">Suspendida</p>
+                </div>
+                <div class="bg-white shadow-sm sm:rounded-lg p-4 text-center">
+                    <p class="text-2xl font-semibold text-orange-700">{{ $summary['lecciones_perdidas'] }}</p>
+                    <p class="text-xs uppercase tracking-wide text-gray-400 mt-1">Lecciones perdidas</p>
+                </div>
             </div>
 
             <!-- Ausencias y tardías -->
@@ -107,6 +115,7 @@
                             <th class="px-4 py-2">Fecha</th>
                             <th class="px-4 py-2">Subárea</th>
                             <th class="px-4 py-2">Estado</th>
+                            <th class="px-4 py-2">Lecciones</th>
                             <th class="px-4 py-2">Observación</th>
                             <th class="px-4 py-2">Avisado por WhatsApp</th>
                         </tr>
@@ -121,6 +130,7 @@
                                         {{ ucfirst($item->status) }}
                                     </span>
                                 </td>
+                                <td class="px-4 py-2 text-gray-600">{{ $item->lessons ?? '—' }}</td>
                                 <td class="px-4 py-2 text-gray-600">{{ $item->notes ?? '—' }}</td>
                                 <td class="px-4 py-2">
                                     @if ($item->notified_at)
@@ -136,7 +146,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="6" class="px-4 py-6 text-center text-gray-500">
                                     No tiene ausencias ni tardías en este periodo.
                                 </td>
                             </tr>
@@ -164,11 +174,18 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $notificationColors = [
+                                'ausente' => 'bg-red-100 text-red-800',
+                                'tardia' => 'bg-yellow-100 text-yellow-800',
+                                'suspendida' => 'bg-gray-200 text-gray-700',
+                            ];
+                        @endphp
                         @forelse ($notifications as $notification)
                             <tr class="border-b">
                                 <td class="px-4 py-2">{{ $notification->sent_at->format('d/m/Y h:i A') }}</td>
                                 <td class="px-4 py-2">
-                                    <span class="px-2 py-1 text-xs rounded-full {{ $notification->status === 'ausente' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    <span class="px-2 py-1 text-xs rounded-full {{ $notificationColors[$notification->status] }}">
                                         {{ ucfirst($notification->status) }}
                                     </span>
                                 </td>
@@ -197,6 +214,7 @@
                             <th class="px-4 py-2">Fecha</th>
                             <th class="px-4 py-2">Subárea</th>
                             <th class="px-4 py-2">Estado</th>
+                            <th class="px-4 py-2">Lecciones</th>
                             <th class="px-4 py-2">Observación</th>
                         </tr>
                     </thead>
@@ -208,6 +226,7 @@
                                     'ausente' => 'bg-red-100 text-red-800',
                                     'tardia' => 'bg-yellow-100 text-yellow-800',
                                     'justificada' => 'bg-blue-100 text-blue-800',
+                                    'suspendida' => 'bg-gray-200 text-gray-700',
                                 ];
                             @endphp
                             <tr class="border-b">
@@ -218,11 +237,12 @@
                                         {{ ucfirst($item->status) }}
                                     </span>
                                 </td>
+                                <td class="px-4 py-2 text-gray-600">{{ $item->lessons ?? '—' }}</td>
                                 <td class="px-4 py-2 text-gray-600">{{ $item->notes ?? '—' }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="px-4 py-6 text-center text-gray-500">
+                                <td colspan="5" class="px-4 py-6 text-center text-gray-500">
                                     No hay registros de asistencia en este periodo.
                                 </td>
                             </tr>

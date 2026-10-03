@@ -78,6 +78,7 @@
         .badge-ausente { background-color: #fee2e2; color: #991b1b; }
         .badge-tardia { background-color: #fef3c7; color: #92400e; }
         .badge-justificada { background-color: #dbeafe; color: #1e40af; }
+        .badge-suspendida { background-color: #e5e7eb; color: #374151; }
         .badge-sin_registrar { background-color: #f3f4f6; color: #6b7280; }
         .meta-table td { border: none; padding: 2px 0; font-size: 10px; }
         .meta-label { color: #6b7280; width: 110px; }
@@ -118,6 +119,7 @@
             'ausente' => 'Ausente',
             'tardia' => 'Tardía',
             'justificada' => 'Justificada',
+            'suspendida' => 'Suspendida',
         ];
     @endphp
     @if ($letterheadData)
@@ -131,6 +133,12 @@
         <p>Generado el {{ now()->format('d/m/Y h:i A') }}</p>
     </div>
 
+    @if ($suspension)
+        <div style="border: 1px solid #991b1b; background-color: #fee2e2; padding: 6px 10px; margin-bottom: 10px; border-radius: 4px;">
+            <strong>Clases suspendidas este día.</strong> Motivo: {{ $suspension->reason }}
+        </div>
+    @endif
+
     <table class="meta-table">
         <tr>
             <td class="meta-label">Grupo</td>
@@ -140,7 +148,7 @@
         </tr>
         <tr>
             <td class="meta-label">Subárea</td>
-            <td>{{ $subject->name ?? 'No especificada' }}</td>
+            <td>{{ $suspension ? 'No aplica (día suspendido)' : ($subject->name ?? 'No especificada') }}</td>
             <td class="meta-label">Docente</td>
             <td>{{ $teacher->name }}</td>
         </tr>
@@ -158,6 +166,7 @@
                 <th>Ausente</th>
                 <th>Tardía</th>
                 <th>Justificada</th>
+                <th>Suspendida</th>
                 <th>Sin registrar</th>
             </tr>
         </thead>
@@ -167,6 +176,7 @@
                 <td>{{ $summary['ausente'] }}</td>
                 <td>{{ $summary['tardia'] }}</td>
                 <td>{{ $summary['justificada'] }}</td>
+                <td>{{ $summary['suspendida'] }}</td>
                 <td>{{ $summary['sin_registrar'] }}</td>
             </tr>
         </tbody>
@@ -180,6 +190,7 @@
                 <th>Estudiante</th>
                 <th>Identificación</th>
                 <th class="col-status">Estado</th>
+                <th>Lecciones</th>
                 <th>Observación</th>
             </tr>
         </thead>
@@ -196,11 +207,12 @@
                             <span class="badge badge-sin_registrar">Sin registrar</span>
                         @endif
                     </td>
+                    <td>{{ $row->lessons ?? '—' }}</td>
                     <td>{{ $row->notes ?? '—' }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="5">No hay estudiantes activos en este grupo.</td>
+                    <td colspan="6">No hay estudiantes activos en este grupo.</td>
                 </tr>
             @endforelse
         </tbody>
@@ -208,10 +220,17 @@
 
     <h2>Observaciones generales</h2>
     <div class="observations-box">
+        @if ($classNote)
+            <p style="margin: 0 0 8px 0; font-size: 10px;">
+                <strong>Trabajo realizado:</strong> {{ $classNote->content }}
+            </p>
+        @endif
         <div class="line"></div>
         <div class="line"></div>
-        <div class="line"></div>
-        <div class="line"></div>
+        @unless ($classNote)
+            <div class="line"></div>
+            <div class="line"></div>
+        @endunless
     </div>
 
     <table class="signatures">

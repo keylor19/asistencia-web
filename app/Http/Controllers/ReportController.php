@@ -16,7 +16,7 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $groups = Auth::user()->groups;
-        $subjects = Subject::orderBy('name')->get();
+        $subjects = Subject::where('user_id', Auth::id())->orderBy('name')->get();
 
         $groupId = $request->query('group', $groups->first()->id ?? null);
         $subjectId = $request->query('subject'); // vacío = todas las subáreas
@@ -54,6 +54,8 @@ class ReportController extends Controller
                 'ausente' => $items->where('status', 'ausente')->count(),
                 'tardia' => $items->where('status', 'tardia')->count(),
                 'justificada' => $items->where('status', 'justificada')->count(),
+                'suspendida' => $items->where('status', 'suspendida')->count(),
+                'lecciones_perdidas' => (int) $items->whereIn('status', ['ausente', 'tardia'])->sum('lessons'),
             ];
         })->sortBy('name')->values();
 
@@ -110,6 +112,8 @@ class ReportController extends Controller
             'ausente' => $attendances->where('status', 'ausente')->count(),
             'tardia' => $attendances->where('status', 'tardia')->count(),
             'justificada' => $attendances->where('status', 'justificada')->count(),
+            'suspendida' => $attendances->where('status', 'suspendida')->count(),
+            'lecciones_perdidas' => (int) $attendances->whereIn('status', ['ausente', 'tardia'])->sum('lessons'),
         ];
 
         $notifications = $student->whatsappNotifications()
