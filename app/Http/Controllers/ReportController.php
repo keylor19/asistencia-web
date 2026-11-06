@@ -6,6 +6,7 @@ use App\Models\Group;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Attendance;
+use App\Models\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -18,10 +19,10 @@ class ReportController extends Controller
         $groups = Auth::user()->groups;
         $subjects = Subject::where('user_id', Auth::id())->orderBy('name')->get();
 
-        $groupId = $request->query('group', $groups->first()->id ?? null);
+        $groupId = $request->query('group'); // vacío = todavía no escoge grupo
         $subjectId = $request->query('subject'); // vacío = todas las subáreas
 
-        $period = $request->query('period', 'day'); // day | week | month
+        $period = $request->query('period', 'day'); // day | week | month | semester1 | semester2 | all
         $date = $request->query('date', Carbon::today()->format('Y-m-d'));
 
         [$startDate, $endDate] = $this->resolveDateRange($period, $date);
@@ -34,8 +35,12 @@ class ReportController extends Controller
             $this->authorize('access', $group);
 
             $query = Attendance::with(['student', 'subject'])
-                ->where('group_id', $groupId)
-                ->whereBetween('attendance_date', [$startDate, $endDate]);
+                ->where('group_id', $groupId);
+
+            // "Todo el registro" no filtra por fechas: toma todas las veces que se ha pasado lista.
+            if ($period !== 'all') {
+                $query->whereBetween('attendance_date', [$startDate, $endDate]);
+            }
 
             if ($subjectId) {
                 $query->where('subject_id', $subjectId);
@@ -44,9 +49,20 @@ class ReportController extends Controller
             $records = $query->orderBy('attendance_date')
                 ->get()
                 ->groupBy('student_id');
+
+            if ($period === 'all' && $records->isNotEmpty()) {
+                $all = $records->flatten();
+                $startDate = $all->min('attendance_date');
+                $endDate = $all->max('attendance_date');
+            }
         }
 
-        $summary = $records->map(function ($items) {
+        $minPercentage = $group->min_attendance_percentage ?? 80;
+        $attendanceWeight = (float) ($group->attendance_weight ?? 5);
+
+        $summary = $records->map(function ($items) use ($minPercentage, $attendanceWeight) {
+            $percentage = Attendance::percentageOf($items);
+
             return [
                 'student_id' => $items->first()->student_id,
                 'name' => $items->first()->student->full_name,
@@ -56,13 +72,48 @@ class ReportController extends Controller
                 'justificada' => $items->where('status', 'justificada')->count(),
                 'suspendida' => $items->where('status', 'suspendida')->count(),
                 'lecciones_perdidas' => (int) $items->whereIn('status', ['ausente', 'tardia'])->sum('lessons'),
+                'porcentaje' => $percentage,
+                'en_riesgo' => $percentage !== null && $percentage < $minPercentage,
+                // Parte proporcional del valor de la asistencia: 90% de asistencia con valor 5% = 4.5%.
+                'puntos' => $percentage === null ? null : round($percentage * $attendanceWeight / 100, 2),
             ];
         })->sortBy('name')->values();
 
+        $groupPercentage = Attendance::percentageOf($records->flatten());
+        $atRiskCount = $summary->where('en_riesgo', true)->count();
+
+        $semesterYear = Carbon::parse($date)->year;
+        $semesters = Semester::datesFor(Auth::id(), $semesterYear);
+
         return view('reports.index', compact(
             'groups', 'groupId', 'group', 'subjects', 'subjectId',
-            'period', 'date', 'startDate', 'endDate', 'records', 'summary'
+            'period', 'date', 'startDate', 'endDate', 'records', 'summary',
+            'minPercentage', 'attendanceWeight', 'groupPercentage', 'atRiskCount',
+            'semesterYear', 'semesters'
         ));
+    }
+
+    /**
+     * Guarda el porcentaje mínimo de asistencia exigido al grupo y cuánto vale
+     * la asistencia en la nota. Vuelve al reporte con los mismos filtros.
+     */
+    public function updateSettings(Request $request, Group $group)
+    {
+        $this->authorize('access', $group);
+
+        $validated = $request->validate([
+            'min_attendance_percentage' => 'required|integer|min:1|max:100',
+            'attendance_weight' => 'required|numeric|min:0.01|max:100',
+        ]);
+
+        $group->update($validated);
+
+        return redirect()
+            ->route('reports.index', array_merge(
+                $request->only(['subject', 'period', 'date']),
+                ['group' => $group->id]
+            ))
+            ->with('success', 'Configuración de asistencia actualizada.');
     }
 
     /**
@@ -155,8 +206,39 @@ class ReportController extends Controller
         return match ($period) {
             'week' => [$carbon->copy()->startOfWeek(), $carbon->copy()->endOfWeek()],
             'month' => [$carbon->copy()->startOfMonth(), $carbon->copy()->endOfMonth()],
+            'semester1' => Semester::datesFor(Auth::id(), $carbon->year)[1],
+            'semester2' => Semester::datesFor(Auth::id(), $carbon->year)[2],
             default => [$carbon->copy(), $carbon->copy()],
         };
+    }
+
+    /**
+     * Guarda las fechas del I y II semestre de un año para el docente.
+     * Vuelve al reporte con los mismos filtros.
+     */
+    public function updateSemesters(Request $request)
+    {
+        $validated = $request->validate([
+            'year' => 'required|integer|min:2000|max:2100',
+            'semester1_start' => 'required|date',
+            'semester1_end' => 'required|date|after_or_equal:semester1_start',
+            'semester2_start' => 'required|date|after:semester1_end',
+            'semester2_end' => 'required|date|after_or_equal:semester2_start',
+        ]);
+
+        foreach ([1, 2] as $number) {
+            Semester::updateOrCreate(
+                ['user_id' => Auth::id(), 'year' => $validated['year'], 'number' => $number],
+                [
+                    'start_date' => $validated["semester{$number}_start"],
+                    'end_date' => $validated["semester{$number}_end"],
+                ]
+            );
+        }
+
+        return redirect()
+            ->route('reports.index', $request->only(['group', 'subject', 'period', 'date']))
+            ->with('success', "Fechas de los semestres {$validated['year']} actualizadas.");
     }
 
     /**

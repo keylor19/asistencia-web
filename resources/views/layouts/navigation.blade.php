@@ -11,26 +11,45 @@
                 </div>
 
                 <!-- Navigation Links -->
+                @php
+                    $attendanceActive = request()->routeIs('dashboard', 'groups.*', 'attendance.*', 'suspensions.*', 'reports.*', 'students.*', 'subjects.*');
+                    // Componente de la nota abierto: en la lista viene en la URL, al calificar sale de la evaluación.
+                    $currentCategory = request()->route('category') ?? optional(request()->route('evaluation'))->category;
+                @endphp
+
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                    <!-- Asistencia agrupa todo lo de pasar lista -->
+                    <div class="flex items-center">
+                        <x-dropdown align="left" width="48">
+                            <x-slot name="trigger">
+                                <button class="inline-flex items-center h-16 px-1 pt-1 border-b-2 text-sm font-medium leading-5 focus:outline-none transition duration-150 ease-in-out
+                                    {{ $attendanceActive ? 'border-indigo-400 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' }}">
+                                    {{ __('Asistencia') }}
+                                    <svg class="ms-1 fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </x-slot>
+
+                            <x-slot name="content">
+                                <x-dropdown-link :href="route('groups.index')">{{ __('Pasar lista') }}</x-dropdown-link>
+                                <x-dropdown-link :href="route('reports.index')">{{ __('Reportes de asistencia') }}</x-dropdown-link>
+                                <x-dropdown-link :href="route('students.index')">{{ __('Estudiantes') }}</x-dropdown-link>
+                                <x-dropdown-link :href="route('subjects.index')">{{ __('Subáreas') }}</x-dropdown-link>
+                            </x-slot>
+                        </x-dropdown>
+                    </div>
+
+                    @foreach (\App\Models\Evaluation::CATEGORIES as $key => $info)
+                        <x-nav-link :href="route('evaluations.index', $key)" :active="$currentCategory === $key">
+                            {{ $info['label'] }}
+                        </x-nav-link>
+                    @endforeach
+
+                    <x-nav-link :href="route('grades.index')" :active="request()->routeIs('grades.*')">
+                        {{ __('Notas') }}
                     </x-nav-link>
                 </div>
-                <x-nav-link :href="route('groups.index')" :active="request()->routeIs('groups.index')">
-                {{ __('Mis Grupos') }}
-                </x-nav-link>
-
-            <x-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
-                 {{ __('Estudiantes') }}
-                </x-nav-link>
-            <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')">
-            {{ __('Reportes') }}
-            </x-nav-link>
-
-            <x-nav-link :href="route('subjects.index')" :active="request()->routeIs('subjects.*')">
-            {{ __('Subáreas') }}
-             </x-nav-link>
-
             </div>
 
             <!-- Settings Dropdown -->
@@ -82,8 +101,28 @@
     <!-- Responsive Navigation Menu -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+            <p class="px-4 pt-2 text-xs font-semibold uppercase text-gray-400">{{ __('Asistencia') }}</p>
+            <x-responsive-nav-link :href="route('groups.index')" :active="request()->routeIs('dashboard', 'groups.*', 'attendance.*', 'suspensions.*')">
+                {{ __('Pasar lista') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')">
+                {{ __('Reportes de asistencia') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('students.index')" :active="request()->routeIs('students.*')">
+                {{ __('Estudiantes') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('subjects.index')" :active="request()->routeIs('subjects.*')">
+                {{ __('Subáreas') }}
+            </x-responsive-nav-link>
+
+            <p class="px-4 pt-3 text-xs font-semibold uppercase text-gray-400">{{ __('Evaluación') }}</p>
+            @foreach (\App\Models\Evaluation::CATEGORIES as $key => $info)
+                <x-responsive-nav-link :href="route('evaluations.index', $key)" :active="$currentCategory === $key">
+                    {{ $info['label'] }}
+                </x-responsive-nav-link>
+            @endforeach
+            <x-responsive-nav-link :href="route('grades.index')" :active="request()->routeIs('grades.*')">
+                {{ __('Notas') }}
             </x-responsive-nav-link>
         </div>
 

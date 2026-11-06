@@ -27,6 +27,11 @@ class Student extends Model
         return $this->hasMany(WhatsappNotification::class);
     }
 
+    public function evaluationScores(): HasMany
+    {
+        return $this->hasMany(EvaluationScore::class);
+    }
+
     /**
      * Teléfono del encargado normalizado para enlaces de WhatsApp (wa.me),
      * con código de país 506 agregado si no viene incluido.

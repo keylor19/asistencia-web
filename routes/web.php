@@ -8,6 +8,9 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\ClassSuspensionController;
+use App\Http\Controllers\EvaluationController;
+use App\Http\Controllers\GradeController;
+use App\Models\Evaluation;
 
 Route::get('/', function () {
     return view('welcome');
@@ -50,8 +53,26 @@ Route::middleware('auth')->group(function () {
     Route::delete('/subareas/{subject}', [SubjectController::class, 'destroy'])->name('subjects.destroy');
 
     Route::get('/reportes', [ReportController::class, 'index'])->name('reports.index');
+    Route::put('/reportes/semestres', [ReportController::class, 'updateSemesters'])->name('reports.semesters');
+    Route::put('/reportes/{group}/configuracion',[ReportController::class, 'updateSettings'])->name('reports.settings');
     Route::get('/reportes/estudiante/{student}', [ReportController::class, 'student'])->name('reports.student');
     Route::get('/reportes/estudiante/{student}/pdf', [ReportController::class, 'studentPdf'])->name('reports.student.pdf');
+
+    // Componentes de la nota: /evaluaciones/pruebas, /evaluaciones/cotidiano, /evaluaciones/proyectos, /evaluaciones/tareas
+    Route::whereIn('category', array_keys(Evaluation::CATEGORIES))->group(function () {
+        Route::get('/evaluaciones/{category}', [EvaluationController::class, 'index'])->name('evaluations.index');
+        Route::post('/evaluaciones/{category}', [EvaluationController::class, 'store'])->name('evaluations.store');
+        Route::put('/evaluaciones/{category}/valor/{group}', [EvaluationController::class, 'updateWeight'])->name('evaluations.weight');
+    });
+    Route::get('/evaluacion/{evaluation}', [EvaluationController::class, 'show'])->name('evaluations.show');
+    Route::put('/evaluacion/{evaluation}', [EvaluationController::class, 'update'])->name('evaluations.update');
+    Route::delete('/evaluacion/{evaluation}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');
+
+    Route::get('/notas', [GradeController::class, 'index'])->name('grades.index');
+    Route::get('/notas/{group}/excel', [GradeController::class, 'export'])->name('grades.export');
+    Route::get('/notas/{group}/pdf', [GradeController::class, 'groupPdf'])->name('grades.group-pdf');
+    Route::get('/notas/estudiante/{student}/pdf', [GradeController::class, 'studentPdf'])->name('grades.student-pdf');
+    Route::get('/notas/estudiante/{student}', [GradeController::class, 'student'])->name('grades.student');
 });
 
 require __DIR__.'/auth.php';

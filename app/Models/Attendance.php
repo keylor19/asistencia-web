@@ -15,6 +15,24 @@ class Attendance extends Model
         'attendance_date' => 'date',
     ];
 
+    /**
+     * Porcentaje de asistencia sobre las veces que se pasó lista. Las clases
+     * suspendidas no cuentan; solo ausencias y tardías rebajan, la justificada no.
+     * Devuelve null si no hay registros que contar.
+     */
+    public static function percentageOf($items): ?float
+    {
+        $counted = $items->where('status', '!=', 'suspendida');
+
+        if ($counted->isEmpty()) {
+            return null;
+        }
+
+        $attended = $counted->whereIn('status', ['presente', 'justificada'])->count();
+
+        return round($attended / $counted->count() * 100, 1);
+    }
+
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
