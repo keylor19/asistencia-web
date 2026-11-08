@@ -14,6 +14,12 @@
                 $componentKeys = array_merge(['asistencia'], array_keys(\App\Models\Evaluation::CATEGORIES));
             @endphp
 
+            @if (session('success'))
+                <div class="mb-4 p-4 bg-green-100 text-green-800 rounded-lg">
+                    {{ session('success') }}
+                </div>
+            @endif
+
             <!-- Filtros -->
             <div class="bg-white shadow-sm sm:rounded-lg p-6 mb-6">
                 <form method="GET" action="{{ route('grades.index') }}" class="flex flex-wrap items-end gap-4">
@@ -46,6 +52,7 @@
                         <select name="semester" class="border-gray-300 rounded-lg text-sm">
                             <option value="1" @selected($semester === 1)>I Semestre</option>
                             <option value="2" @selected($semester === 2)>II Semestre</option>
+                            <option value="anual" @selected($semester === 'anual')>Promedio anual</option>
                         </select>
                     </div>
 
@@ -73,13 +80,14 @@
                 </form>
                 @if ($group)
                     <p class="text-xs text-gray-500 mt-2">
-                        El Excel trae una hoja por subárea y el PDF una página por estudiante con su desglose por subárea
-                        ({{ $subjectId ? 'solo la escogida' : 'las que tienen evaluaciones o listas en el semestre' }}).
+                        El Excel trae una hoja por subárea y el PDF una página por estudiante con su
+                        {{ $semester === 'anual' ? 'promedio anual' : 'desglose' }} por subárea
+                        ({{ $subjectId ? 'solo la escogida' : 'las que tienen evaluaciones o listas en el ' . ($semester === 'anual' ? 'año' : 'semestre') }}).
                     </p>
                 @endif
 
                 <p class="text-sm text-gray-500 mt-3">
-                    {{ $semester === 1 ? 'I' : 'II' }} Semestre {{ $year }}: del
+                    {{ ['anual' => 'Año lectivo', 1 => 'I Semestre', 2 => 'II Semestre'][$semester] }} {{ $year }}: del
                     <strong>{{ $startDate->format('d/m/Y') }}</strong> al <strong>{{ $endDate->format('d/m/Y') }}</strong>
                     — Grupo: <strong>{{ $group->name ?? '—' }}</strong>
                     — Subárea: <strong>{{ $subjectId ? optional($subjects->find($subjectId))->name : 'Todas' }}</strong>
@@ -98,6 +106,9 @@
                     </div>
                 @endif
 
+                @if ($semester === 'anual')
+                    @include('grades._annual-table')
+                @else
                 <div class="bg-white shadow-sm sm:rounded-lg p-6">
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm text-left">
@@ -167,6 +178,7 @@
                         semestre. Hacé clic en un estudiante para ver el detalle.
                     </p>
                 </div>
+                @endif
             @else
                 <div class="bg-white shadow-sm sm:rounded-lg p-6 text-center text-gray-500">
                     {{ $groups->isEmpty() ? 'No tienes grupos asignados todavía.' : 'Escogé un grupo y dale al botón para ver la información.' }}

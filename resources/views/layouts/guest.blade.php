@@ -22,7 +22,7 @@
                     linear-gradient(135deg, #0f5132 0%, #14713f 35%, #0e6b6e 70%, #0b4f66 100%);
             }
             .attendance-pattern {
-                background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc3MicgaGVpZ2h0PSc3Micgdmlld0JveD0nMCAwIDcyIDcyJz48ZyBmaWxsPSdub25lJyBzdHJva2U9J3doaXRlJyBzdHJva2Utd2lkdGg9JzInIG9wYWNpdHk9JzAuNTUnPjxyZWN0IHg9JzEyJyB5PScxNicgd2lkdGg9JzQ4JyBoZWlnaHQ9JzQwJyByeD0nNScvPjxsaW5lIHgxPScxMicgeTE9JzI3JyB4Mj0nNjAnIHkyPScyNycvPjxsaW5lIHgxPScyMycgeTE9JzknIHgyPScyMycgeTI9JzIwJy8+PGxpbmUgeDE9JzQ5JyB5MT0nOScgeDI9JzQ5JyB5Mj0nMjAnLz48cGF0aCBkPSdNMjcgNDEgTDM0IDQ4IEw0OSAzMycgc3Ryb2tlLXdpZHRoPSczJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnLz48L2c+PC9zdmc+Cg==");
+                background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MiIgaGVpZ2h0PSI3MiIgdmlld0JveD0iMCAwIDcyIDcyIj48ZyBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgb3BhY2l0eT0iMC41NSI+PHJlY3QgeD0iMTciIHk9IjEyIiB3aWR0aD0iMzgiIGhlaWdodD0iNTAiIHJ4PSI1Ii8+PHJlY3QgeD0iMjgiIHk9IjciIHdpZHRoPSIxNiIgaGVpZ2h0PSI5IiByeD0iMiIvPjxwYXRoIGQ9Ik0yMyAyNyBsMyAzIDUtNSIvPjxsaW5lIHgxPSIzNSIgeTE9IjI4IiB4Mj0iNDkiIHkyPSIyOCIvPjxwYXRoIGQ9Ik0yMyAzOSBsMyAzIDUtNSIvPjxsaW5lIHgxPSIzNSIgeTE9IjQwIiB4Mj0iNDkiIHkyPSI0MCIvPjxwYXRoIGQ9Ik0yMyA1MSBsMyAzIDUtNSIvPjxsaW5lIHgxPSIzNSIgeTE9IjUyIiB4Mj0iNDUiIHkyPSI1MiIvPjwvZz48L3N2Zz4=");
                 background-size: 72px 72px;
                 opacity: 0.16;
             }
@@ -42,7 +42,7 @@
                     Colegio Técnico Profesional Los Chiles
                 </h1>
                 <p class="text-white/80 text-sm mt-1">
-                    Sistema de Control de Asistencia
+                    Sistema de Control de Evaluación
                 </p>
             </div>
 

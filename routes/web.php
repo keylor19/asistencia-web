@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/evaluacion/{evaluation}', [EvaluationController::class, 'destroy'])->name('evaluations.destroy');
 
     Route::get('/notas', [GradeController::class, 'index'])->name('grades.index');
+    Route::put('/notas/{group}/notas-a-mano', [GradeController::class, 'storeManualGrades'])->name('grades.manual');
     Route::get('/notas/{group}/excel', [GradeController::class, 'export'])->name('grades.export');
     Route::get('/notas/{group}/pdf', [GradeController::class, 'groupPdf'])->name('grades.group-pdf');
     Route::get('/notas/estudiante/{student}/pdf', [GradeController::class, 'studentPdf'])->name('grades.student-pdf');

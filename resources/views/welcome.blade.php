@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>{{ config('app.name', 'Asistencia CTP Los Chiles') }}</title>
+        <title>{{ config('app.name', 'Evaluación CTP Los Chiles') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -21,7 +21,7 @@
                     linear-gradient(135deg, #0f5132 0%, #14713f 35%, #0e6b6e 70%, #0b4f66 100%);
             }
             .attendance-pattern {
-                background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnIHdpZHRoPSc3MicgaGVpZ2h0PSc3Micgdmlld0JveD0nMCAwIDcyIDcyJz48ZyBmaWxsPSdub25lJyBzdHJva2U9J3doaXRlJyBzdHJva2Utd2lkdGg9JzInIG9wYWNpdHk9JzAuNTUnPjxyZWN0IHg9JzEyJyB5PScxNicgd2lkdGg9JzQ4JyBoZWlnaHQ9JzQwJyByeD0nNScvPjxsaW5lIHgxPScxMicgeTE9JzI3JyB4Mj0nNjAnIHkyPScyNycvPjxsaW5lIHgxPScyMycgeTE9JzknIHgyPScyMycgeTI9JzIwJy8+PGxpbmUgeDE9JzQ5JyB5MT0nOScgeDI9JzQ5JyB5Mj0nMjAnLz48cGF0aCBkPSdNMjcgNDEgTDM0IDQ4IEw0OSAzMycgc3Ryb2tlLXdpZHRoPSczJyBzdHJva2UtbGluZWNhcD0ncm91bmQnIHN0cm9rZS1saW5lam9pbj0ncm91bmQnLz48L2c+PC9zdmc+Cg==");
+                background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI3MiIgaGVpZ2h0PSI3MiIgdmlld0JveD0iMCAwIDcyIDcyIj48ZyBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIgb3BhY2l0eT0iMC41NSI+PHJlY3QgeD0iMTciIHk9IjEyIiB3aWR0aD0iMzgiIGhlaWdodD0iNTAiIHJ4PSI1Ii8+PHJlY3QgeD0iMjgiIHk9IjciIHdpZHRoPSIxNiIgaGVpZ2h0PSI5IiByeD0iMiIvPjxwYXRoIGQ9Ik0yMyAyNyBsMyAzIDUtNSIvPjxsaW5lIHgxPSIzNSIgeTE9IjI4IiB4Mj0iNDkiIHkyPSIyOCIvPjxwYXRoIGQ9Ik0yMyAzOSBsMyAzIDUtNSIvPjxsaW5lIHgxPSIzNSIgeTE9IjQwIiB4Mj0iNDkiIHkyPSI0MCIvPjxwYXRoIGQ9Ik0yMyA1MSBsMyAzIDUtNSIvPjxsaW5lIHgxPSIzNSIgeTE9IjUyIiB4Mj0iNDUiIHkyPSI1MiIvPjwvZz48L3N2Zz4=");
                 background-size: 72px 72px;
                 opacity: 0.14;
             }
@@ -42,7 +42,7 @@
                         </div>
                         <div class="text-white leading-tight">
                             <p class="font-semibold text-sm sm:text-base">CTP Los Chiles</p>
-                            <p class="text-white/70 text-xs">Sistema de Control de Asistencia</p>
+                            <p class="text-white/70 text-xs">Sistema de Control de Evaluación</p>
                         </div>
                     </div>
 
@@ -71,12 +71,27 @@
                                 Colegio Técnico Profesional Los Chiles
                             </span>
                             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-4">
-                                Sistema de Control de Asistencia para Docentes
+                                Sistema de Control de Evaluación para Docentes
                             </h1>
-                            <p class="text-white/85 text-base sm:text-lg mb-8 max-w-xl mx-auto lg:mx-0">
-                                Registra, consulta y gestiona la asistencia de tus estudiantes de forma rápida,
-                                ordenada y desde un solo lugar.
+                            <p class="text-white/85 text-base sm:text-lg mb-6 max-w-xl mx-auto lg:mx-0">
+                                Registra y controla toda la evaluación de tus estudiantes: trabajo cotidiano,
+                                asistencia, proyectos, pruebas y tareas, con la nota de cada semestre calculada
+                                por subárea.
                             </p>
+                            <ul class="text-white/85 text-sm space-y-2 mb-8 max-w-xl mx-auto lg:mx-0 text-left inline-block">
+                                <li class="flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5 shrink-0 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Configura cuánto vale cada componente en la nota.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5 shrink-0 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Califica y mira al instante cuánto porcentaje gana cada estudiante.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mt-0.5 shrink-0 text-emerald-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Descarga las notas en Excel y el desglose en PDF para entregar.
+                                </li>
+                            </ul>
                             <div class="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
                                 <a href="{{ route('login') }}"
                                    class="inline-flex items-center justify-center px-6 py-3 bg-white text-emerald-800 font-semibold rounded-lg shadow hover:bg-emerald-50 transition">
@@ -88,38 +103,52 @@
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div class="bg-white/95 rounded-xl shadow-lg p-5">
                                 <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
                                 </div>
-                                <h3 class="font-semibold text-gray-800 mb-1">Registro diario</h3>
-                                <p class="text-sm text-gray-600">Marca la asistencia de cada grupo en segundos.</p>
+                                <h3 class="font-semibold text-gray-800 mb-1">Trabajo cotidiano</h3>
+                                <p class="text-sm text-gray-600">Registra lo que realizan en clase y califícalo día a día.</p>
                             </div>
                             <div class="bg-white/95 rounded-xl shadow-lg p-5">
                                 <div class="w-10 h-10 rounded-lg bg-sky-100 text-sky-700 flex items-center justify-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg>
                                 </div>
-                                <h3 class="font-semibold text-gray-800 mb-1">Reportes claros</h3>
-                                <p class="text-sm text-gray-600">Consulta el historial y las estadísticas por estudiante o grupo.</p>
+                                <h3 class="font-semibold text-gray-800 mb-1">Asistencia</h3>
+                                <p class="text-sm text-gray-600">Pasa lista y obtén el porcentaje que vale en la nota.</p>
                             </div>
                             <div class="bg-white/95 rounded-xl shadow-lg p-5">
                                 <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
                                 </div>
-                                <h3 class="font-semibold text-gray-800 mb-1">Grupos y materias</h3>
-                                <p class="text-sm text-gray-600">Organiza tus secciones y asignaturas fácilmente.</p>
+                                <h3 class="font-semibold text-gray-800 mb-1">Proyectos</h3>
+                                <p class="text-sm text-gray-600">Lleva el control de cada proyecto y su valor en la nota.</p>
+                            </div>
+                            <div class="bg-white/95 rounded-xl shadow-lg p-5">
+                                <div class="w-10 h-10 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-1">Pruebas</h3>
+                                <p class="text-sm text-gray-600">Una o varias pruebas, repartiendo el porcentaje como quieras.</p>
+                            </div>
+                            <div class="bg-white/95 rounded-xl shadow-lg p-5">
+                                <div class="w-10 h-10 rounded-lg bg-violet-100 text-violet-700 flex items-center justify-center mb-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                                </div>
+                                <h3 class="font-semibold text-gray-800 mb-1">Tareas</h3>
+                                <p class="text-sm text-gray-600">Anota cada tarea, sus puntos y quién la entregó.</p>
                             </div>
                             <div class="bg-white/95 rounded-xl shadow-lg p-5">
                                 <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center mb-3">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg>
                                 </div>
-                                <h3 class="font-semibold text-gray-800 mb-1">Acceso seguro</h3>
-                                <p class="text-sm text-gray-600">Solo el personal docente autorizado puede ingresar.</p>
+                                <h3 class="font-semibold text-gray-800 mb-1">Nota del semestre</h3>
+                                <p class="text-sm text-gray-600">La suma de todo por estudiante, I y II semestre.</p>
                             </div>
                         </div>
                     </div>
                 </main>
 
                 <footer class="text-center text-white/60 text-xs py-6">
-                    &copy; {{ date('Y') }} Colegio Técnico Profesional Los Chiles &mdash; Sistema de Control de Asistencia
+                    &copy; {{ date('Y') }} Colegio Técnico Profesional Los Chiles &mdash; Sistema de Control de Evaluación
                 </footer>
             </div>
         </div>
